@@ -1,2 +1,4 @@
 /secrets.py
 /photos/*
+*.json
+/haar/*
