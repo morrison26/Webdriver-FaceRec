@@ -46,13 +46,14 @@ class TinderBot():
         self.driver.find_element_by_xpath('//*[@id="modal-manager"]/div/div/div/div/div[3]/button[1]').click()
 
     def check(self):
-        try:
-            self.driver.find_element_by_xpath('//*[@id="content"]/div/div[1]/div/main/div[1]/div/div/div[1]/div/div[2]/button[3]')
-        except Exception:
+        while True:
             try:
                 self.popup()
             except Exception:
-                self.close_match()
+                try:
+                    self.close_match()
+                except Exception:
+                    break
 
     def like(self):
         like_btn = self.driver.find_element_by_xpath('//*[@id="content"]/div/div[1]/div/main/div[1]/div/div/div[1]/div/div[2]/button[3]')
@@ -86,15 +87,16 @@ class TinderBot():
         profile_id = max(files2) + 1
         i = 0
 
-        while i < 3:
+        for i in range(2):
             sleep(0.2)
             self.check()
             for image_id in range(5):
                 self.get_pic(profile_id, image_id)
                 sleep(0.1)
                 ActionChains(self.driver).send_keys(Keys.SPACE).perform()
-            self.like()
             profile_id += 1
+            i += 1
+            self.like()
 
 bot = TinderBot()
 bot.login()
