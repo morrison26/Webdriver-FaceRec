@@ -78,6 +78,7 @@ class TinderBot():
 
     def swiper(self):
         files = []
+        actions = ActionChains(self.driver).send_keys(Keys.SPACE)
         for (_, _, filename) in walk("photos"):
             files.extend(filename)
             break
@@ -93,7 +94,7 @@ class TinderBot():
             for image_id in range(5):
                 self.get_pic(profile_id, image_id)
                 sleep(0.1)
-                ActionChains(self.driver).send_keys(Keys.SPACE).perform()
+                actions.perform()
             profile_id += 1
             i += 1
             self.like()
