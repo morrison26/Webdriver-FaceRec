@@ -1,7 +1,10 @@
+from time import sleep
+from os import walk
+
 from selenium import webdriver
 from selenium.webdriver.common.action_chains import ActionChains
 from selenium.webdriver.common.keys import Keys
-from time import sleep
+
 from secrets import username, password
 
 class TinderBot():
@@ -42,12 +45,17 @@ class TinderBot():
 
         self.driver.find_element_by_xpath('//*[@id="modal-manager"]/div/div/div/div/div[3]/button[1]').click()
 
+    def check(self):
+        try:
+            self.driver.find_element_by_xpath('//*[@id="content"]/div/div[1]/div/main/div[1]/div/div/div[1]/div/div[2]/button[3]')
+        except Exception:
+            try:
+                self.popup()
+            except Exception:
+                self.close_match()
+
     def like(self):
         like_btn = self.driver.find_element_by_xpath('//*[@id="content"]/div/div[1]/div/main/div[1]/div/div/div[1]/div/div[2]/button[3]')
-        ActionChains(self.driver).send_keys(Keys.ARROW_UP)
-        for image_id in range(5):
-            self.get_pic(profile_id, image_id)
-            ActionChains(self.driver).send_keys(Keys.SPACE)
         like_btn.click()
 
     def dislike(self):
@@ -64,24 +72,29 @@ class TinderBot():
         self.matches += 1
 
     def get_pic(self, profile_id, img_id):
-        img = self.driver.find_element_by_xpath('//*[@id="content"]/div/div[1]/div/main/div[1]/div/div/div[1]/div[1]/div/div[1]/span/a[2]/div/div[1]/div/div[1]/div/div/div')
-        img.screenshot(f"pictures/{profile_id}_{img_id}")
-    #
-    #     actions.send_keys(Keys)
+        img = self.driver.find_element_by_xpath('//*[@id="content"]/div/div[1]/div/main/div[1]/div/div/div[1]/div')
+        img.screenshot(f"photos/{profile_id}_{img_id}.png")
 
     def swiper(self):
+        files = []
+        for (_, _, filename) in walk("photos"):
+            files.extend(filename)
+            break
+
+        files2 = [int(file.split("_")[0]) for file in files]
+
+        profile_id = max(files2) + 1
         i = 0
 
-        while i < 10:
-            sleep(0.5)
-            try:
-                self.like()
-            except Exception:
-                try:
-                    self.popup()
-                except Exception:
-                    self.close_match()
-            i += 1
+        while i < 3:
+            sleep(0.2)
+            self.check()
+            for image_id in range(5):
+                self.get_pic(profile_id, image_id)
+                sleep(0.1)
+                ActionChains(self.driver).send_keys(Keys.SPACE).perform()
+            self.like()
+            profile_id += 1
 
 bot = TinderBot()
 bot.login()
